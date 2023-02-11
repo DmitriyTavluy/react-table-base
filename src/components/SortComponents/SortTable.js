@@ -1,19 +1,17 @@
-import React, { useEffect, useMemo } from 'react';
-import { useTable } from 'react-table';
-
-import { COLUMNS } from '../assets/columns';
-
+import React, { useMemo, useEffect } from 'react';
+import { useTable, useSortBy } from 'react-table';
+import { COLUMNS } from '../../assets/columns';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchTablesItems } from '../redux/itemSlice';
+import { fetchTablesItems } from '../../redux/itemSlice';
 import {
   TableStyled,
   ThStyled,
   TrStyled,
   TdStyled,
   TdFootStyled,
-} from '../assets/table.style.js';
+} from '../../assets/table.style.js';
 
-const BasicTable = (props) => {
+const SortTable = (props) => {
   const dispatch = useDispatch();
   const items = useSelector((state) => state.item.items);
 
@@ -31,10 +29,13 @@ const BasicTable = (props) => {
     footerGroups,
     rows,
     prepareRow,
-  } = useTable({
-    columns,
-    data,
-  });
+  } = useTable(
+    {
+      columns,
+      data,
+    },
+    useSortBy
+  );
 
   return (
     <TableStyled {...getTableProps()}>
@@ -42,8 +43,13 @@ const BasicTable = (props) => {
         {headerGroups.map((headerGroup) => (
           <TrStyled {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
-              <ThStyled {...column.getHeaderProps()}>
+              <ThStyled
+                {...column.getHeaderProps(column.getSortByToggleProps())}
+              >
                 {column.render('Header')}
+                <span>
+                  {column.isSorted ? (column.isSortedDesc ? '↓' : '↑') : ''}
+                </span>
               </ThStyled>
             ))}
           </TrStyled>
@@ -80,4 +86,4 @@ const BasicTable = (props) => {
   );
 };
 
-export default BasicTable;
+export default SortTable;
